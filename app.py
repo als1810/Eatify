@@ -159,7 +159,7 @@ def compare_dishes():
     query = """
         SELECT d.dish_name, r.restaurant_name, d.unit_price, 
                COALESCE(o.percentage, 0) AS discount,
-               ROUND(d.unit_price * (1 - COALESCE(o.percentage, 0)/100), 2) AS final_price
+               get_discounted_price(d.dish_id) AS final_price
         FROM Dish d
         JOIN Restaurant r ON d.restaurant_id = r.restaurant_id
         LEFT JOIN Offer o ON d.dish_id = o.dish_id 
@@ -337,34 +337,9 @@ def add_order():
                 cur.execute("INSERT INTO Orders (customer_id, status) VALUES (%s, 'Pending')", (customer_id,))
                 order_id = cur.lastrowid
                 
+                # Add each item using procedure
                 for item in cart:
-                    dish_id = item['dish_id']
-                    quantity = item['quantity']
-                    
-                    # Get dish price
-                    cur.execute("SELECT unit_price FROM Dish WHERE dish_id = %s", (dish_id,))
-                    result = cur.fetchone()
-                    unit_price = result[0] if result else 0
-                    
-                    # Find offer
-                    cur.execute("""
-                        SELECT offer_id, percentage FROM Offer 
-                        WHERE dish_id = %s AND CURDATE() BETWEEN start_date AND end_date 
-                        ORDER BY percentage DESC LIMIT 1
-                    """, (dish_id,))
-                    offer = cur.fetchone()
-                    if offer:
-                        offer_id = offer[0]
-                        discount = offer[1] / 100
-                    else:
-                        offer_id = None
-                        discount = 0
-                    
-                    # Insert order item
-                    cur.execute("""
-                        INSERT INTO Orders_Item (order_id, dish_id, offer_id, unit_price, quantity)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (order_id, dish_id, offer_id, unit_price, quantity))
+                    cur.execute("CALL add_order_item(%s, %s, %s)", (order_id, item['dish_id'], item['quantity']))
                 
                 conn.commit()
                 
@@ -428,30 +403,23 @@ def pay_order(order_id):
     if request.method == 'POST':
         payment_type = request.form['payment_type']
         
-        # Calculate total
-        cur.execute("""
-            SELECT oi.unit_price, oi.quantity, COALESCE(o.percentage, 0) as discount
-            FROM Orders_Item oi
-            LEFT JOIN Offer o ON oi.offer_id = o.offer_id
-            WHERE oi.order_id = %s
-        """, (order_id,))
-        items = cur.fetchall()
-        total_amount = sum(item['unit_price'] * item['quantity'] * (1 - item['discount']/100) for item in items)
-        
-        # Insert payment
-        cur.execute("""
-            INSERT INTO Payment (order_id, amount, payment_type)
-            VALUES (%s, %s, %s)
-        """, (order_id, total_amount, payment_type))
-        
-        # Update order status
-        cur.execute("UPDATE Orders SET status = 'Completed' WHERE order_id = %s", (order_id,))
-        
-        conn.commit()
-        conn.close()
-        
-        flash("Payment successful! Order completed.", "success")
-        return redirect(url_for('view_orders'))
+        try:
+            conn = get_connection()
+            cur = conn.cursor()
+            
+            # Process payment using procedure
+            cur.execute("CALL process_payment(%s, %s)", (order_id, payment_type))
+            
+            conn.commit()
+            conn.close()
+            
+            flash("Payment successful! Order completed.", "success")
+            return redirect(url_for('view_orders'))
+        except Exception as e:
+            conn.rollback()
+            flash(f"Error processing payment: {str(e)}", "danger")
+        finally:
+            conn.close()
     
     # GET: Show order details
     cur.execute("""
@@ -483,6 +451,10 @@ def update_order(order_id):
 
     if request.method == 'POST':
         new_status = request.form['status']
+        allowed_statuses = ['Pending', 'Completed']
+        if new_status not in allowed_statuses:
+            flash("❌ Invalid status. Allowed: Pending, Completed", "danger")
+            return redirect(url_for('update_order', order_id=order_id))
         try:
             cur.execute("UPDATE Orders SET status = %s WHERE order_id = %s", (new_status, order_id))
             conn.commit()
@@ -546,42 +518,25 @@ def reports():
     cur = conn.cursor(dictionary=True)
 
     # --- 1️⃣ Total Sales per Restaurant ---
-    cur.execute("""
-        SELECT r.restaurant_name, SUM(p.amount) AS total_sales
-        FROM Payment p
-        JOIN Orders o ON p.order_id = o.order_id
-        JOIN Orders_Item oi ON o.order_id = oi.order_id
-        JOIN Dish d ON oi.dish_id = d.dish_id
-        JOIN Restaurant r ON d.restaurant_id = r.restaurant_id
-        GROUP BY r.restaurant_name
-        ORDER BY total_sales DESC
-    """)
-    sales = cur.fetchall()
-
+    cur.callproc('get_total_sales')
+    sales = []
+    for result in cur.stored_results():
+        rows = result.fetchall()
+        sales = [{'restaurant_name': row[0], 'total_sales': row[1]} for row in rows]
+    
     # --- 2️⃣ Orders with Offers ---
-    cur.execute("""
-        SELECT c.first_name, d.dish_name, o2.percentage AS discount, p.amount
-        FROM Orders_Item oi
-        JOIN Orders o ON oi.order_id = o.order_id
-        JOIN Customer c ON o.customer_id = c.customer_id
-        JOIN Dish d ON oi.dish_id = d.dish_id
-        LEFT JOIN Offer o2 ON oi.offer_id = o2.offer_id
-        JOIN Payment p ON o.order_id = p.order_id
-        WHERE o2.offer_id IS NOT NULL
-    """)
-    offers = cur.fetchall()
-
+    cur.callproc('get_orders_with_offers')
+    offers = []
+    for result in cur.stored_results():
+        rows = result.fetchall()
+        offers = [{'first_name': row[0], 'dish_name': row[1], 'discount': row[2], 'amount': row[3]} for row in rows]
+    
     # --- 3️⃣ High Spenders ---
-    cur.execute("""
-        SELECT c.first_name, SUM(p.amount) AS total_spent
-        FROM Customer c
-        JOIN Orders o ON c.customer_id = o.customer_id
-        JOIN Payment p ON o.order_id = p.order_id
-        GROUP BY c.customer_id
-        HAVING total_spent > (SELECT AVG(amount) FROM Payment)
-        ORDER BY total_spent DESC
-    """)
-    high_spenders = cur.fetchall()
+    cur.callproc('get_high_spenders')
+    high_spenders = []
+    for result in cur.stored_results():
+        rows = result.fetchall()
+        high_spenders = [{'first_name': row[0], 'total_spent': row[1]} for row in rows]
 
     conn.close()
 

@@ -11,12 +11,6 @@
       </div>
       <div>
         <span class="badge bg-{% if order.status == 'Completed' %}success{% elif order.status == 'Pending' %}warning{% else %}secondary{% endif %}">{{ order.status }}</span>
-        {% if current_user.role == 'admin' %}
-        <a href="{{ url_for('update_order', order_id=order.order_id) }}" class="btn btn-sm btn-outline-primary ms-2">✏️ Edit</a>
-        <form method="POST" action="{{ url_for('delete_order', order_id=order.order_id) }}" style="display:inline;">
-          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this order?');">🗑️ Delete</button>
-        </form>
-        {% endif %}
       </div>
     </div>
   </div>

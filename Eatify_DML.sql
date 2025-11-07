@@ -145,9 +145,9 @@ INSERT INTO Orders (customer_id, status, order_time) VALUES
 (2, 'Completed', '2025-09-18 11:30:00'), -- order_id = 2 (Offer 2 active)
 (3, 'Pending',   '2025-09-22 12:45:00'), -- order_id = 3 (Offer 3 active)
 (4, 'Completed', '2025-09-25 13:00:00'), -- order_id = 4 (Offer 4 active)
-(5, 'Cancelled', '2025-09-26 14:15:00'), -- order_id = 5 (Offer 5 active)
+(5, 'Completed', '2025-09-26 14:15:00'), -- order_id = 5 (Offer 5 active)
 (6, 'Completed', '2025-11-03 15:00:00'), -- order_id = 6 (Offer 6 active)
-(7, 'Shipped',   '2025-09-01 16:20:00'), -- order_id = 7 (Offer 7 expired, order placed after expiry)
+(7, 'Completed',   '2025-09-01 16:20:00'), -- order_id = 7 (Offer 7 expired, order placed after expiry)
 (8, 'Completed', '2025-11-04 17:30:00'), -- order_id = 8 (Offer 8 active)
 (9, 'Pending',   '2025-11-05 18:00:00'), -- order_id = 9 (Offer 9 future)
 (10, 'Completed', '2025-10-20 19:10:00'); -- order_id = 10 (Offer 10 expired)
@@ -158,9 +158,9 @@ INSERT INTO Orders (customer_id, status, order_time) VALUES
 (2, 'Completed', '2025-11-02 11:00:00'), -- order_id = 12
 (3, 'Pending', '2025-11-03 12:00:00'), -- order_id = 13
 (4, 'Completed', '2025-11-04 13:00:00'), -- order_id = 14
-(5, 'Cancelled', '2025-11-05 14:00:00'), -- order_id = 15
+(5, 'Completed', '2025-11-05 14:00:00'), -- order_id = 15
 (6, 'Completed', '2025-11-06 15:00:00'), -- order_id = 16
-(7, 'Shipped', '2025-11-06 16:00:00'), -- order_id = 17
+(7, 'Completed', '2025-11-06 16:00:00'), -- order_id = 17
 (8, 'Completed', '2025-11-06 17:00:00'), -- order_id = 18
 (9, 'Pending', '2025-11-06 18:00:00'), -- order_id = 19
 (10, 'Completed', '2025-11-06 19:00:00'); -- order_id = 20
@@ -196,7 +196,7 @@ INSERT INTO Orders_Item (order_id, dish_id, offer_id, unit_price, quantity) VALU
 -- Order 2: 400 * 1 * (1 - 0.15) = 340.00 (Credit Card)
 -- Order 3: 180 * 2 * (1 - 0.20) = 288.00 (Cash)
 -- Order 4: 120 * 1 * (1 - 0.05) = 114.00 (Debit Card)
--- Order 5: 150 * 3 * (1 - 0.12) = 396.00 (UPI) - Cancelled, but payment recorded
+-- Order 5: 150 * 3 * (1 - 0.12) = 396.00 (UPI)
 -- Order 6: 350 * 2 * (1 - 0.10) = 630.00 (Credit Card)
 -- Order 7: 280 * 1 * (1 - 0.00) = 280.00 (Cash)
 -- Order 8: 100 * 5 * (1 - 0.05) = 475.00 (Debit Card)
