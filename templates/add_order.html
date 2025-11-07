@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Place a New Order</h2>
+
+<div class="card shadow p-4">
+  <form method="POST" id="orderForm">
+    <div class="mb-3">
+      <label>Customer Type</label>
+      <select id="customerType" class="form-control" required>
+        <option value="registered" selected>Registered Customer</option>
+        <option value="new">New Customer</option>
+      </select>
+    </div>
+
+    <div id="existingCustomerSection">
+      <div class="mb-3">
+        <label>Customer</label>
+        <select name="customer_id" class="form-control">
+          <option disabled selected>Select Customer</option>
+          {% for c in customers %}
+          <option value="{{ c.customer_id }}">{{ c.first_name }} {{ c.last_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label>Restaurant</label>
+      <select id="restaurantSelect" name="restaurant_id" class="form-control" required>
+        <option disabled selected>Select Restaurant</option>
+        {% for r in restaurants %}
+        <option value="{{ r.restaurant_id }}">{{ r.restaurant_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Dish</label>
+      <select id="dishSelect" name="dish_id" class="form-control" required>
+        <option disabled selected>Select Dish</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Quantity</label>
+      <input type="number" name="quantity" class="form-control" min="1" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Payment Type</label>
+      <select name="payment_type" class="form-control" required>
+        <option value="UPI">UPI</option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="Debit Card">Debit Card</option>
+        <option value="Cash">Cash</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Place Order</button>
+    <a href="{{ url_for('register_customer') }}" id="registerBtn" class="btn btn-success" style="display:none;">Register New Customer</a>
+  </form>
+</div>
+
+<script>
+const typeSelect = document.getElementById("customerType");
+const registerBtn = document.getElementById("registerBtn");
+const existingSection = document.getElementById("existingCustomerSection");
+
+typeSelect.addEventListener("change", function() {
+  if (this.value === "new") {
+    registerBtn.style.display = "inline-block";
+    existingSection.style.display = "none";
+  } else {
+    registerBtn.style.display = "none";
+    existingSection.style.display = "block";
+  }
+});
+
+document.getElementById("restaurantSelect").addEventListener("change", function() {
+  const restaurantId = this.value;
+  fetch(`/get_dishes/${restaurantId}`)
+    .then(res => res.json())
+    .then(data => {
+      const dishSelect = document.getElementById("dishSelect");
+      dishSelect.innerHTML = '<option disabled selected>Select Dish</option>';
+      data.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d.dish_id;
+        opt.textContent = `${d.dish_name} - ₹${d.unit_price}`;
+        dishSelect.appendChild(opt);
+      });
+    });
+});
+</script>
+{% endblock %}

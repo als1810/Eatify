@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">📊 Reports Dashboard</h2>
+
+<!-- ===== 1️⃣ Total Sales per Restaurant ===== -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body text-center">
+    <h4>1️⃣ Total Sales per Restaurant</h4>
+    <img src="{{ sales_chart }}" alt="Sales Chart" class="img-fluid rounded shadow-sm mb-3" />
+    <table class="table table-sm table-bordered">
+      <thead><tr><th>Restaurant</th><th>Total Sales (₹)</th></tr></thead>
+      <tbody>
+        {% for s in sales %}
+        <tr><td>{{ s.restaurant_name }}</td><td>{{ s.total_sales }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 2️⃣ Orders with Offers Applied ===== -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body text-center">
+    <h4>2️⃣ Dishes with Offers</h4>
+    <img src="{{ discounts_chart }}" alt="Offers Chart" class="img-fluid rounded shadow-sm mb-3" />
+    <table class="table table-sm table-bordered">
+      <thead><tr><th>Customer</th><th>Dish</th><th>Discount (%)</th><th>Amount</th></tr></thead>
+      <tbody>
+        {% for o in offers %}
+        <tr><td>{{ o.first_name }}</td><td>{{ o.dish_name }}</td><td>{{ o.discount }}</td><td>{{ o.amount }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 3️⃣ Customers Who Spent Above Average ===== -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body text-center">
+    <h4>3️⃣ Customers Who Spent Above Average</h4>
+    <img src="{{ spenders_chart }}" alt="High Spenders Chart" class="img-fluid rounded shadow-sm mb-3" />
+    <table class="table table-sm table-bordered">
+      <thead><tr><th>Customer</th><th>Total Spent (₹)</th></tr></thead>
+      <tbody>
+        {% for h in high_spenders %}
+        <tr><td>{{ h.first_name }}</td><td>{{ h.total_spent }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

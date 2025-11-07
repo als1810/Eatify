@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Compare Dish Prices Across Restaurants</h2>
+
+{% for dish_name, entries in dishes.items() %}
+<div class="card mb-4 shadow-sm">
+  <div class="card-header bg-dark text-white fw-bold">{{ dish_name }}</div>
+  <div class="card-body">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Restaurant</th>
+          <th>Base Price (₹)</th>
+          <th>Offer (%)</th>
+          <th>Final Price (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set min_price = entries|min(attribute='final_price') %}
+        {% for e in entries %}
+        <tr {% if e.final_price == min_price.final_price %}class="table-success fw-bold"{% endif %}>
+          <td>{{ e.restaurant_name }}</td>
+          <td>{{ e.unit_price }}</td>
+          <td>{{ e.discount }}</td>
+          <td>{{ e.final_price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

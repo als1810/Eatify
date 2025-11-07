@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Registered Customers</h2>
+<table class="table table-hover table-bordered">
+  <thead class="table-dark">
+    <tr>
+      <th>ID</th>
+      <th>Customer Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Preferred Payment</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in customers %}
+    <tr>
+      <td>{{ c.customer_id }}</td>
+      <td>{{ c.first_name }} {{ c.last_name }}</td>
+      <td>{{ c.email }}</td>
+      <td>{{ c.phone_no }}</td>
+      <td>{{ c.preferred_payment_type }}</td>
+      <td>
+        <a href="{{ url_for('my_orders', customer_id=c.customer_id) }}" class="btn btn-sm btn-primary">
+          🧾 View Orders
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
