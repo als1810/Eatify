@@ -2,28 +2,10 @@
 {% block content %}
 <h2>Place a New Order</h2>
 
-<div class="card shadow p-4">
-  <form method="POST" id="orderForm">
-    <div class="mb-3">
-      <label>Customer Type</label>
-      <select id="customerType" class="form-control" required>
-        <option value="registered" selected>Registered Customer</option>
-        <option value="new">New Customer</option>
-      </select>
-    </div>
-
-    <div id="existingCustomerSection">
-      <div class="mb-3">
-        <label>Customer</label>
-        <select name="customer_id" class="form-control">
-          <option disabled selected>Select Customer</option>
-          {% for c in customers %}
-          <option value="{{ c.customer_id }}">{{ c.first_name }} {{ c.last_name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-
+<div class="card shadow p-4 mb-4">
+  <h4>Add Item to Cart</h4>
+  <form method="POST" id="addItemForm">
+    <input type="hidden" name="action" value="add_item">
     <div class="mb-3">
       <label>Restaurant</label>
       <select id="restaurantSelect" name="restaurant_id" class="form-control" required>
@@ -46,36 +28,55 @@
       <input type="number" name="quantity" class="form-control" min="1" required>
     </div>
 
-    <div class="mb-3">
-      <label>Payment Type</label>
-      <select name="payment_type" class="form-control" required>
-        <option value="UPI">UPI</option>
-        <option value="Credit Card">Credit Card</option>
-        <option value="Debit Card">Debit Card</option>
-        <option value="Cash">Cash</option>
-      </select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Place Order</button>
-    <a href="{{ url_for('register_customer') }}" id="registerBtn" class="btn btn-success" style="display:none;">Register New Customer</a>
+    <button type="submit" class="btn btn-primary">Add to Cart</button>
   </form>
 </div>
 
+{% if cart %}
+<div class="card shadow p-4 mb-4">
+  <h4>Your Cart</h4>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Restaurant</th>
+        <th>Dish</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart %}
+      <tr>
+        <td>{{ item.restaurant_name }}</td>
+        <td>{{ item.dish_name }}</td>
+        <td>{{ item.quantity }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card shadow p-4">
+  <h4>Place Order</h4>
+  <form method="POST">
+    <input type="hidden" name="action" value="place_order">
+    {% if customers %}
+    <div class="mb-3">
+      <label>Customer</label>
+      <select name="customer_id" class="form-control" required>
+        <option disabled selected>Select Customer</option>
+        {% for c in customers %}
+        <option value="{{ c.customer_id }}">{{ c.first_name }} {{ c.last_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-success">Place Order</button>
+  </form>
+</div>
+{% endif %}
+
 <script>
-const typeSelect = document.getElementById("customerType");
-const registerBtn = document.getElementById("registerBtn");
-const existingSection = document.getElementById("existingCustomerSection");
-
-typeSelect.addEventListener("change", function() {
-  if (this.value === "new") {
-    registerBtn.style.display = "inline-block";
-    existingSection.style.display = "none";
-  } else {
-    registerBtn.style.display = "none";
-    existingSection.style.display = "block";
-  }
-});
-
 document.getElementById("restaurantSelect").addEventListener("change", function() {
   const restaurantId = this.value;
   fetch(`/get_dishes/${restaurantId}`)

@@ -9,8 +9,11 @@ DELETE FROM Restaurant;
 DELETE FROM Category;
 
 
--- CATEGORIES (for Veg Restaurants)
-INSERT INTO Category (category_name) VALUES
+-- CUSTOMERS
+INSERT INTO Customer (first_name, last_name, DoB, email, phone_no, preferred_payment_type, password_hash, role) VALUES
+('Alice', 'Johnson', '1990-05-15', 'alice@example.com', '1234567890', 'UPI', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPjYLC7Tkz5m', 'user'),  -- password: password
+('Bob', 'Smith', '1985-03-22', 'bob@example.com', '0987654321', 'Credit Card', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPjYLC7Tkz5m', 'user'),
+('Admin', 'User', '1980-01-01', 'admin@eatify.com', '1111111111', 'Cash', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPjYLC7Tkz5m', 'admin');
 ('Starters'),         -- id 1
 ('North Indian'),     -- id 2
 ('South Indian'),     -- id 3
@@ -26,20 +29,20 @@ INSERT INTO Category (category_name) VALUES
 -- RESTAURANTS
 
 -- Pure Veg Restaurants (IDs 1–5)
-INSERT INTO Restaurant (restaurant_name, location) VALUES
-('Green Leaf', 'Mumbai'),
-('Spice Villa', 'Delhi'),
-('Veggie Palace', 'Bangalore'),
-('Dosa Delight', 'Chennai'),
-('Shuddh Swaad', 'Pune');
+INSERT INTO Restaurant (restaurant_name, restaurant_category) VALUES
+('Green Leaf', 'Pure Veg'),
+('Spice Villa', 'Pure Veg'),
+('Veggie Palace', 'Pure Veg'),
+('Dosa Delight', 'Pure Veg'),
+('Shuddh Swaad', 'Pure Veg');
 
 -- Veg + Non-Veg Restaurants (IDs 6–10)
-INSERT INTO Restaurant (restaurant_name, location) VALUES
-('The Grill House', 'Hyderabad'),
-('Urban Tandoor', 'Kolkata'),
-('Curry Junction', 'Lucknow'),
-('Food Carnival', 'Mysore'),
-('The Spice Yard', 'Ahmedabad');
+INSERT INTO Restaurant (restaurant_name, restaurant_category) VALUES
+('The Grill House', 'Veg + Non-Veg'),
+('Urban Tandoor', 'Veg + Non-Veg'),
+('Curry Junction', 'Veg + Non-Veg'),
+('Food Carnival', 'Veg + Non-Veg'),
+('The Spice Yard', 'Veg + Non-Veg');
 
 -- DISHES
 

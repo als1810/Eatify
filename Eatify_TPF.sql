@@ -58,7 +58,7 @@ BEGIN
     ORDER BY percentage DESC 
     LIMIT 1;
 
-    -- Insert into Orders_Item using the base price
+    -- Insert into Orders_Item
     INSERT INTO Orders_Item (order_id, dish_id, offer_id, unit_price, quantity)
     VALUES (v_order_id, p_dish_id, v_offer_id, v_unit_price, p_quantity);
 

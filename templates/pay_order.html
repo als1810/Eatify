@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Complete Payment for Order #{{ order_id }}</h2>
+
+<div class="card shadow p-4">
+  <h4>Order Summary</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Dish</th>
+        <th>Restaurant</th>
+        <th>Unit Price</th>
+        <th>Quantity</th>
+        <th>Discount</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order_items %}
+      <tr>
+        <td>{{ item.dish_name }}</td>
+        <td>{{ item.restaurant_name }}</td>
+        <td>₹{{ "%.2f"|format(item.unit_price) }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.discount }}%</td>
+        <td>₹{{ "%.2f"|format(item.unit_price * item.quantity * (1 - item.discount/100)) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="5">Total Amount</th>
+        <th>₹{{ "%.2f"|format(total) }}</th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <form method="POST" class="mt-4">
+    <div class="mb-3">
+      <label>Payment Method</label>
+      <select name="payment_type" class="form-control" required>
+        <option value="UPI">UPI</option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="Debit Card">Debit Card</option>
+        <option value="Cash">Cash</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success btn-lg">Pay Now</button>
+    <a href="{{ url_for('view_orders') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

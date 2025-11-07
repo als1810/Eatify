@@ -10,14 +10,16 @@ CREATE TABLE Customer (
     DoB DATE,
     email VARCHAR(100) UNIQUE,
     phone_no VARCHAR(15) UNIQUE,
-    preferred_payment_type VARCHAR(20)
+    preferred_payment_type VARCHAR(20),
+    password_hash VARCHAR(255),
+    role ENUM('user', 'admin') DEFAULT 'user'
 ); 
 
 -- 2. Restaurant Table
 CREATE TABLE Restaurant (
     restaurant_id INT PRIMARY KEY AUTO_INCREMENT,
     restaurant_name VARCHAR(100) NOT NULL,
-    location VARCHAR(200)
+    restaurant_category VARCHAR(50)
 );
 
 -- 3. Category Table

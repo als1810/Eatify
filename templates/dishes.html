@@ -11,8 +11,8 @@
               aria-controls="collapse{{ loop.index }}">
         🍽️ {{ restaurant_name }}
         <span class="ms-2 badge 
-          {% if info.type == 'Pure Veg' %}bg-success{% else %}bg-danger{% endif %}">
-          {{ info.type }}
+          {% if info.category == 'Non-Veg' %}bg-danger{% else %}bg-success{% endif %}">
+          {{ info.category }}
         </span>
       </button>
     </h2>

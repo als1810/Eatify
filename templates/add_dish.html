@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add Dish to {{ restaurant.restaurant_name }}</h2>
+
+<form method="POST">
+  <div class="mb-3">
+    <label>Dish Name</label>
+    <input type="text" name="dish_name" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label>Unit Price</label>
+    <input type="number" step="0.01" name="unit_price" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label>Category</label>
+    <select name="category_id" class="form-control">
+      <option value="">None</option>
+      {% for cat in categories %}
+      <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Add Dish</button>
+  <a href="{{ url_for('manage_restaurant', restaurant_id=restaurant_id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

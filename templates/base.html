@@ -12,13 +12,27 @@
   <div class="container-fluid">
     <a class="navbar-brand" href="/">🍽️ Eatify</a>
     <div class="navbar-nav">
-      <a class="nav-link" href="/customers">Customers</a>
       <a class="nav-link" href="/dishes">Dishes</a>
-      <a class="nav-link" href="/orders">Orders</a>
-      <a class="nav-link" href="/add_order">Place Order</a>
-      <a class="nav-link" href="/reports">Reports</a>
-      <a class="nav-link" href="/compare_dishes">Compare Dishes</a>
-      <a class="nav-link" href="/register_customer">Register</a>
+      {% if current_user.is_authenticated %}
+        {% if current_user.role == 'user' %}
+          <a class="nav-link" href="/orders">Orders</a>
+          <a class="nav-link" href="/add_order">Place Order</a>
+        {% elif current_user.role == 'owner' %}
+          <a class="nav-link" href="/my_restaurants">My Restaurants</a>
+        {% elif current_user.role == 'manager' %}
+          <a class="nav-link" href="/orders">Orders</a>
+          <a class="nav-link" href="/reports">Reports</a>
+        {% elif current_user.role == 'admin' %}
+          <a class="nav-link" href="/customers">Customers</a>
+          <a class="nav-link" href="/orders">Orders</a>
+          <a class="nav-link" href="/reports">Reports</a>
+        {% endif %}
+        <a class="nav-link" href="/compare_dishes">Compare Dishes</a>
+        <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ current_user.email }})</a>
+      {% else %}
+        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+        <a class="nav-link" href="/register_customer">Register</a>
+      {% endif %}
     </div>
   </div>
 </nav>
