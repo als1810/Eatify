@@ -100,3 +100,9 @@ source venv/bin/activate # On Windows, use `venv\Scripts\activate`
 Install Dependencies:
 
 pip install Flask flask-login mysql-connector-python bcrypt matplotlib
+
+3. Configure Database Connection
+   
+Create a file named db_config.py in the root directory.
+
+Update the connection details using your MySQL credentials:
